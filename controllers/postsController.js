@@ -34,15 +34,15 @@ export const createPost = async (req, res) => {
 
 // ******************* Delete Post *******************
 export const deletePost = async (req, res) => {
-  const postID = req.params.postID;
+  const id = req.params.id;
 
   // Check Id is valid
-  if (!mongoose.Types.ObjectId.isValid(postID)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ status: 'FAIL', msg: 'INVALID ID' });
   }
 
   // Check the post exist
-  const post = await Post.findById(postID);
+  const post = await Post.findById(id);
   if (!post) {
     return res.status(400).json({ status: 'FAIL', msg: 'post does not exist' });
   }
@@ -50,6 +50,38 @@ export const deletePost = async (req, res) => {
   try {
     await post.deleteOne();
     res.status(200).json({ status: 'SUCCESS', msg: 'Post was deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ******************* Update Post *******************
+export const updatePost = async (req, res) => {
+  const id = req.params.id;
+  // Check Id is valid
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ status: 'FAIL', msg: 'INVALID ID' });
+  }
+
+  // Check the post exist
+  const post = await Post.findById(id);
+  if (!post) {
+    return res.status(400).json({ status: 'FAIL', msg: 'post does not exist' });
+  }
+
+  // Grab Data
+  const { title, body } = req.body;
+
+  // Validate Date
+  if (!title.trim() || !body.trim()) {
+    return res
+      .status(400)
+      .json({ status: 'FAIL', error: 'All Fields are Required' });
+  }
+
+  try {
+    await post.updateOne({ title, body });
+    res.status(200).json({ status: 'SUCCESS', msg: 'Post was Updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

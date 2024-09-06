@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Post from '../models/PostsModel.js';
 
 // ******************* Get All Posts *******************
@@ -26,6 +27,29 @@ export const createPost = async (req, res) => {
   try {
     const post = await Post.create({ title, body });
     res.status(201).json({ status: 'SUCCESSES', data: { post } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ******************* Delete Post *******************
+export const deletePost = async (req, res) => {
+  const postID = req.params.postID;
+
+  // Check Id is valid
+  if (!mongoose.Types.ObjectId.isValid(postID)) {
+    return res.status(400).json({ status: 'FAIL', msg: 'INVALID ID' });
+  }
+
+  // Check the post exist
+  const post = await Post.findById(postID);
+  if (!post) {
+    return res.status(400).json({ status: 'FAIL', msg: 'post does not exist' });
+  }
+
+  try {
+    await post.deleteOne();
+    res.status(200).json({ status: 'SUCCESS', msg: 'Post was deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

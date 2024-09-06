@@ -3,6 +3,19 @@ import Post from '../models/PostsModel.js';
 
 const router = express.Router();
 
+// ******************* Get All Posts *******************
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Post.find();
+    if (!posts) {
+      return res.status(404).json({ status: 'FAIL', msg: 'No Posts' });
+    }
+    res.status(200).json({ status: 'SUCCESS', data: { posts } });
+  } catch (error) {
+    return res.status(500).json({ status: 'FAIL', error: error.message });
+  }
+});
+
 // ******************* Create New Post *******************
 router.post('/', async (req, res) => {
   // Grab Data
@@ -20,7 +33,6 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-  console.log(newPost);
 });
 
 export { router as postsRoutes };

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Post from '../models/PostsModel.js';
+import { User } from '../models/UserModel.js';
 
 // ******************* Get All Posts *******************
 export const getAllPosts = async (req, res) => {
@@ -24,8 +25,11 @@ export const createPost = async (req, res) => {
       .status(400)
       .json({ status: 'FAIL', error: 'All Fields are Required' });
   }
+  // Grab user id
+  const user = await User.findById(req.user._id);
+
   try {
-    const post = await Post.create({ title, body });
+    const post = await Post.create({ user: user._id, title, body });
     res.status(201).json({ status: 'SUCCESSES', data: { post } });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -46,7 +50,11 @@ export const deletePost = async (req, res) => {
   if (!post) {
     return res.status(400).json({ status: 'FAIL', msg: 'post does not exist' });
   }
-
+  // Check if user owns the post
+  const user = await User.findById(req.user._id);
+  if (!post.user.equals(user._id)) {
+    return res.status(401).json({ status: 'FAIL', msg: 'Not authorized' });
+  }
   try {
     await post.deleteOne();
     res.status(200).json({ status: 'SUCCESS', msg: 'Post was deleted' });
@@ -77,6 +85,12 @@ export const updatePost = async (req, res) => {
     return res
       .status(400)
       .json({ status: 'FAIL', error: 'All Fields are Required' });
+  }
+
+  // Check if user owns the post
+  const user = await User.findById(req.user._id);
+  if (!post.user.equals(user._id)) {
+    return res.status(401).json({ status: 'FAIL', msg: 'Not authorized' });
   }
 
   try {

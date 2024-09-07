@@ -5,7 +5,7 @@ import { User } from '../models/UserModel.js';
 // ******************* Get All Posts *******************
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ createdAt: 'desc' });
     if (!posts) {
       return res.status(404).json({ status: 'FAIL', msg: 'No Posts' });
     }
@@ -21,7 +21,9 @@ export const getUserPosts = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   try {
-    const userPosts = await Post.find({ user: user._id });
+    const userPosts = await Post.find({ user: user._id }).sort({
+      createdAt: 'desc',
+    });
     if (!userPosts) {
       return res.status(404).json({ status: 'FAIL', msg: 'No Posts' });
     }

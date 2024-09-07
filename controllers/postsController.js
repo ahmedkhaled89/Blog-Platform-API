@@ -27,7 +27,9 @@ export const getUserPosts = async (req, res) => {
     if (!userPosts) {
       return res.status(404).json({ status: 'FAIL', msg: 'No Posts' });
     }
-    res.status(200).json({ status: 'SUCCESS', data: { userPosts } });
+    res
+      .status(200)
+      .json({ status: 'SUCCESS', data: { userPosts, email: user.email } });
   } catch (error) {
     return res.status(500).json({ status: 'FAIL', error: error.message });
   }

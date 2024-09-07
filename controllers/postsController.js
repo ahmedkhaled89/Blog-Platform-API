@@ -14,6 +14,22 @@ export const getAllPosts = async (req, res) => {
     return res.status(500).json({ status: 'FAIL', error: error.message });
   }
 };
+
+// ******************* Get User Posts *******************
+export const getUserPosts = async (req, res) => {
+  // Grab authenticated user form req body
+  const user = await User.findById(req.user._id);
+
+  try {
+    const userPosts = await Post.find({ user: user._id });
+    if (!userPosts) {
+      return res.status(404).json({ status: 'FAIL', msg: 'No Posts' });
+    }
+    res.status(200).json({ status: 'SUCCESS', data: { userPosts } });
+  } catch (error) {
+    return res.status(500).json({ status: 'FAIL', error: error.message });
+  }
+};
 // ******************* Create New Post *******************
 export const createPost = async (req, res) => {
   // Grab Data

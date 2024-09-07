@@ -1,5 +1,12 @@
 import { User } from '../models/UserModel.js';
 import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config.js';
+
+// ******************* Creating Token *******************
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET);
+};
 
 // ******************* Register User *******************
 export const registerUser = async (req, res) => {
@@ -20,12 +27,16 @@ export const registerUser = async (req, res) => {
       .status(400)
       .json({ status: 'FAIL', msg: 'user with the same email already exist' });
   }
-  // Hash the passowrd
+  // Hash the password
   const salt = await bcryptjs.genSalt();
   const hashed = await bcryptjs.hash(password, salt);
   try {
+    // Register the user
     const user = await User.create({ email, password: hashed });
-    res.status(201).json({ status: 'SUCCESS', data: { email } });
+    // Generate the JWT
+    const token = createToken(user._id, process.env.SECRET);
+    // sending the response
+    res.status(201).json({ status: 'SUCCESS', data: { email, token } });
   } catch (error) {
     res.status(500).json({ status: 'FAIL', error: error.message });
   }
@@ -55,7 +66,10 @@ export const loginUser = async (req, res) => {
   }
 
   try {
-    res.status(201).json({ status: 'SUCCESS', data: { email } });
+    // Generate the JWT
+    const token = createToken(user._id, process.env.SECRET);
+    // sending the response
+    res.status(201).json({ status: 'SUCCESS', data: { email, token } });
   } catch (error) {
     res.status(500).json({ status: 'FAIL', error: error.message });
   }

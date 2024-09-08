@@ -17,15 +17,16 @@ export const registerUser = async (req, res) => {
   if (!email.trim() || !password.trim()) {
     return res
       .status(400)
-      .json({ status: 'FAIL', msg: 'All fields are required' });
+      .json({ status: 'FAIL', error: 'All fields are required' });
   }
 
   // Check if email already exist
   const exist = await User.findOne({ email });
   if (exist) {
-    return res
-      .status(400)
-      .json({ status: 'FAIL', msg: 'user with the same email already exist' });
+    return res.status(400).json({
+      status: 'FAIL',
+      error: 'user with the same email already exist',
+    });
   }
   // Hash the password
   const salt = await bcryptjs.genSalt();
@@ -50,19 +51,21 @@ export const loginUser = async (req, res) => {
   if (!email.trim() || !password.trim()) {
     return res
       .status(400)
-      .json({ status: 'FAIL', msg: 'All fields are required' });
+      .json({ status: 'FAIL', error: 'All fields are required' });
   }
 
   // Check if email already exist
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(400).json({ status: 'FAIL', msg: 'Incorrect Email' });
+    return res.status(400).json({ status: 'FAIL', error: 'Incorrect Email' });
   }
 
   //Check password
   const match = await bcryptjs.compare(password, user.password);
   if (!match) {
-    return res.status(400).json({ status: 'FAIL', msg: 'Incorrect password' });
+    return res
+      .status(400)
+      .json({ status: 'FAIL', error: 'Incorrect password' });
   }
 
   try {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { postsRoutes } from './routes/PostsRoutes.js';
+import { postsRoutes } from './routes/postsRoutes.js';
 import mongoose from 'mongoose';
 import { usersRouter } from './routes/usersRouter.js';
 import 'dotenv/config.js';

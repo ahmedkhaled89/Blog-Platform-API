@@ -115,7 +115,7 @@ export const updatePost = async (req, res) => {
 
   try {
     await post.updateOne({ title, body });
-    res.status(200).json({ status: 'SUCCESS', msg: 'Post was Updated' });
+    res.status(200).json({ status: 'SUCCESS', msg: 'Post was Updated', post });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
